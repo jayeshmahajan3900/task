@@ -1,42 +1,49 @@
 const express = require("express");
 const cors = require("cors");
+require('dotenv').config();
 
 const app = express();
 
+// Set CORS options
 var corsOptions = {
-  origin: "http://localhost:8083"
+  origin: "https://66818b6f59415715add69c58--enchanting-sfogliatella-01511c.netlify.app", // Updated to your Netlify URL
 };
 
 app.use(cors(corsOptions));
 
-// parse requests of content-type - application/json
+// Parse requests of content-type - application/json
 app.use(express.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
+// Parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
+// Database configuration and connection
 const db = require("./app/models");
+
+const dbUrl = process.env.MONGO_URI;
+
 db.mongoose
-  .connect(db.url, {
+  .connect(dbUrl, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
   .then(() => {
     console.log("Connected to the database!");
   })
-  .catch(err => {
-    console.log("Cannot connect to the database!", err);
+  .catch((err) => {
+    console.error("Cannot connect to the database!", err.message);
     process.exit();
   });
 
-// simple route
+// Simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Welcome to the task application." });
 });
 
-require("./app/routes/turorial.routes")(app);
+// Import routes
+require("./app/routes/tutorial.routes")(app); // Make sure the file path is correct
 
-// set port, listen for requests
+// Set port, listen for requests
 const PORT = process.env.PORT || 8083;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
